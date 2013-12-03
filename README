@@ -1,0 +1,35 @@
+Velocity
+========
+
+It's a fancy for loop for working on multiple servers.
+
+I've used something like this for many years to manage groups of servers. 
+
+
+## Usage 
+You can use such a tool many different ways:
+
+- put it in a folder with a 'hosts' file and run it from there
+
+ie:
+	$ echo 'servername' > hosts
+	$ ./velocity 
+
+- create a heirachy of project/environment/hosts files and run it from your path
+
+ie:
+put velocity on your path and then create folders like:
+	project/servergroup1/hosts
+	project/servergroup2/hosts
+
+Then to operate on servergroup1 you do this:
+	$ cd project/servergroup1/
+	$ velocity ls
+
+and to operate on servergroup2 you do this:
+	$ cd ../servergroup2/
+	$ velocity ls 
+
+## coming soon
+
+I've used the -p and -g operators for 'put' and 'get' in the past, I'll probably implement them again soon.
