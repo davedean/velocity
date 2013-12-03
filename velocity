@@ -1,4 +1,4 @@
-#!/usr/bin/bash 
+#!/usr/bin/bash -xe
 
 # velocity - a fancy for loop for managing multiple hosts.
 
@@ -31,8 +31,8 @@ fi
 
 # load ssh-options file
 if [ -e ssh-options ] ; then 
-  # load options, removing lines which start with '#' or are empty and insert '-o' separator
-  options="`cat ssh-options | egrep -v '^( *)#' | egrep -v '^( *)$' | sed 's/^/\-o /g' `"  
+  # load options, removing lines which start with '#' or are empty
+  options="`cat ssh-options | sed 's/#.*//g' | egrep -v '^( *)$' `"  
 fi
 
 # if the first option is '-l' for 'local' 
