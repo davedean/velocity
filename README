@@ -1,7 +1,7 @@
 Velocity
 ========
 
-It's a fancy for loop for working on multiple servers.
+It's a fancy for loop for working on multiple servers over ssh.
 
 I've used something like this for many years to manage groups of servers. 
 
@@ -29,6 +29,8 @@ Then to operate on servergroup1 you do this:
 and to operate on servergroup2 you do this:
 	$ cd ../servergroup2/
 	$ velocity ls 
+
+You can also create an 'ssh-options' file which takes in option/value pairs, one per line and will be used as part of the ssh command. Options aren't always sourced (eg: in an ssh-copy-id) so it's generally better to use ~/.ssh/config to set ssh options. 
 
 ## coming soon
 
