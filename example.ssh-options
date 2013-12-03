@@ -1,0 +1,5 @@
+# Example ssh-options file for velocity
+# use root usr
+User ubuntu
+# set a strange port
+Port=1022

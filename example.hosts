@@ -1,0 +1,9 @@
+# This is an example hosts file for velocity.
+# You can put comments in this file, on lines or at the end of host lines
+# comments are ignored entirely by velocity so you can use them for lots of things.
+hostname1 # valid comment
+hostname.domain 
+# Database Server:
+hostname2.domain
+# Web Server:
+hostname4.domain
