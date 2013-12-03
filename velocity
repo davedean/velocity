@@ -1,0 +1,56 @@
+#!/usr/bin/bash 
+
+# velocity - a fancy for loop for managing multiple hosts.
+
+
+# load the hosts file if it exists
+if [ -e hosts ] ; then 
+  # load the hosts file, remove any lines which start with '#' and only take the first string
+  hosts=`cat hosts | egrep -v '^( *)#' | awk '{print $1}' ` ; 
+else
+  # if there's no hosts file we can't do anything anyway, so exit
+  echo "no hosts file?" 
+  exit 5
+fi
+
+# load ssh-options file
+if [ -e ssh-options ] ; then 
+  # load options, removing lines which start with '#' or are empty and insert '-o' separator
+  options="`cat ssh-options | egrep -v '^( *)#' | egrep -v '^( *)$' | sed 's/^/\-o /g' `"  
+fi
+
+# if the first option is '-l' for 'local' 
+if [ "$1" == "-l" ] ; then
+  shift   	# ignore the '-l'
+  command=$@   	# set command
+else
+  REMOTE=true	# set REMOTE
+  command=$@	# set command to be the whole string
+fi
+
+# if the command is to be executed remotely ..
+if [ "$REMOTE" ] ; then
+  for host in $hosts ; do 
+    echo $host >&2
+    # run the command remotely using ssh-options
+    ssh $options "$host" $@  
+  done
+else
+  for host in $hosts ; do 
+    echo $host >&2
+    # run the command locally ignoring ssh options
+    $command $host 
+  done
+fi
+
+CAT<<EOF
+examples:
+
+# copy your ssh key to servers:
+./goto -l ssh-copy-id 
+
+# check the contents of your home dir on servers:
+./goto ls -l 
+
+
+EOF
