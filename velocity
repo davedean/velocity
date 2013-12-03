@@ -47,13 +47,13 @@ fi
 # if the command is to be executed remotely ..
 if [ "$REMOTE" ] ; then
   for host in $hosts ; do 
-    echo $host >&2
+    echo "# $host:" >&2
     # run the command remotely using ssh-options
     ssh $options "$host" $@  
   done
 else
   for host in $hosts ; do 
-    echo $host >&2
+    echo "# $host:" >&2
     # run the command locally ignoring ssh options
     $command $host 
   done
