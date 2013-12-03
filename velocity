@@ -10,6 +10,22 @@ if [ -e hosts ] ; then
 else
   # if there's no hosts file we can't do anything anyway, so exit
   echo "no hosts file?" 
+
+CAT<<EOF
+create a file in the directory you are currently in, called 'hosts'. 
+
+Put hostnames/IPs in the file, you can also use '#' to start comment lines. Then this script will iterate over the hostnames and run commands for you.
+
+You can use the -l option (must be the first argument!) to run local commands like ping or ssh-copy-id etc.
+
+examples:
+
+# copy your ssh key to servers:
+./goto -l ssh-copy-id
+
+# check the contents of your home dir on servers:
+./goto ls -l
+EOF
   exit 5
 fi
 
@@ -43,14 +59,4 @@ else
   done
 fi
 
-CAT<<EOF
-examples:
 
-# copy your ssh key to servers:
-./goto -l ssh-copy-id 
-
-# check the contents of your home dir on servers:
-./goto ls -l 
-
-
-EOF
