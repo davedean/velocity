@@ -1,4 +1,11 @@
-#!/usr/bin/bash -xe
+#!/usr/bin/bash 
+
+if [ "$DEBUG" ] ; then
+  set -x
+  set -e
+fi
+
+
 
 # velocity - a fancy for loop for managing multiple hosts.
 
