@@ -6,7 +6,6 @@ if [ "$DEBUG" ] ; then
 fi
 
 
-
 # velocity - a fancy for loop for managing multiple hosts.
 
 
@@ -36,11 +35,17 @@ EOF
   exit 5
 fi
 
-# load ssh-options file
-if [ -e ssh-options ] ; then 
-  # load options, removing lines which start with '#' or are empty
-  options="`cat ssh-options | sed 's/#.*//g' | egrep -v '^( *)$' `"  
-fi
+# specify options files to set ssh options, global and then local
+options_files="$HOME/.velocity/ssh-options ssh-options"
+
+options=''
+for file in $options_files ; do 
+  if [ -e "$file" ] ; then
+    # load options, removing lines which start with '#' or are empty
+    options="$options `cat "$file" | sed 's/#.*//g' | egrep -v '^( *)$' `"
+  fi
+done
+
 
 # if the first option is '-l' for 'local' 
 if [ "$1" == "-l" ] ; then
@@ -56,23 +61,50 @@ else
   command=$@	# set command to be the whole string
 fi
 
+success=''
+failure=''
 # if the command is to be executed remotely ..
 if [ "$REMOTE" ] ; then
   for host in $hosts ; do 
     echo "# $host:" >&2
     # run the command remotely using ssh-options
     ssh $options "$host" $@  
+    if [ "$?" == "0" ] ; then 
+      success="$success $host "
+    else
+      failure="$failure $host "
+    fi
   done
 elif [ "$mode" == "-l" ] ; then
   for host in $hosts ; do 
     echo "# $host:" >&2
     # run the command locally ignoring ssh options
     $command $host 
+    if [ "$?" == "0" ] ; then
+      success="$success $host "
+    else
+      failure="$failure $host "
+    fi
   done
 elif [ "$mode" == "-p" ] ; then
   for host in $hosts ; do
     echo "# $host:" >&2
     # run the command locally ignoring ssh options
     $command $host:
+    if [ "$?" == "0" ] ; then
+      success="$success $host "
+    else
+      failure="$failure $host "
+    fi
   done
+fi
+
+# print a report
+
+if [ "$success" ] ; then
+  echo "# SUCCESS: $success" >&2
+fi
+
+if [ "$failure" ] ; then
+  echo "# FAILURE: $failure" >&2
 fi
