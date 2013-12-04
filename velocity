@@ -76,4 +76,3 @@ elif [ "$mode" == "-p" ] ; then
     $command $host:
   done
 fi
-
