@@ -44,8 +44,13 @@ fi
 
 # if the first option is '-l' for 'local' 
 if [ "$1" == "-l" ] ; then
+  mode=$1
   shift   	# ignore the '-l'
   command=$@   	# set command
+elif [ "$1" == "-p" ] ; then
+  mode=$1
+  shift         # ignore the '-p'
+  command="scp $@" # set command
 else
   REMOTE=true	# set REMOTE
   command=$@	# set command to be the whole string
@@ -58,12 +63,17 @@ if [ "$REMOTE" ] ; then
     # run the command remotely using ssh-options
     ssh $options "$host" $@  
   done
-else
+elif [ "$mode" == "-l" ] ; then
   for host in $hosts ; do 
     echo "# $host:" >&2
     # run the command locally ignoring ssh options
     $command $host 
   done
+elif [ "$mode" == "-p" ] ; then
+  for host in $hosts ; do
+    echo "# $host:" >&2
+    # run the command locally ignoring ssh options
+    $command $host:
+  done
 fi
-
 
