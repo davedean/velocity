@@ -5,8 +5,37 @@ It's a fancy for loop for working on multiple servers over ssh.
 
 I've used something like this for many years to manage groups of servers. 
 
+## Usage
+In it's simplest you can do this:
 
-## Usage 
+	./velocity <remote command>
+
+You might just want to ping all your hosts from your local box though:
+	
+	./velocity -l <local command>
+
+Or you might want to drop a file on all your hosts:
+
+	./velocity -p <file>
+
+And once you get really used to it you will want to do stuff like ..
+
+	./velocity 'echo "password" | passwd --stdin username' 
+
+to reset a user's password on all hosts. 
+
+## Advanced usage:
+
+You can write wrapper scripts around velocity, which run locally but set things up remotely. An example script which sets up a user account on multiple hosts looks like this:
+
+	velocity "groupadd  -g GID username"
+	velocity "adduser username -c 'Comment' -d /home/username -g GID -u UID"
+	velocity "echo password | passwd --stdin username"
+
+Which is nicer than many other methods.
+
+
+## Setting up
 You can use such a tool many different ways:
 
 - put it in a folder with a 'hosts' file and run it from there
@@ -32,6 +61,12 @@ and to operate on servergroup2 you do this:
 
 You can also create an 'ssh-options' file which takes in option/value pairs, one per line and will be used as part of the ssh command. Options aren't always sourced (eg: in an ssh-copy-id) so it's generally better to use ~/.ssh/config to set ssh options. 
 
-## coming soon
+##  Feature ideas:
 
-I've used the -p and -g operators for 'put' and 'get' in the past, I'll probably implement them again soon.
+- '-g' to GET a file from all servers (drop it in current dir, or arg, with hostname.<filename> for filename)
+- '-a' to load all hosts files below this directory
+- refactor into functions
+- 
+
+
+
