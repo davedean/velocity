@@ -1,24 +1,15 @@
 #!/usr/bin/bash 
 
+# velocity - a fancy for loop for managing multiple hosts.
+
 if [ "$DEBUG" ] ; then
   set -x
   set -e
 fi
 
-
-# velocity - a fancy for loop for managing multiple hosts.
-
-
-# load the hosts file if it exists
-if [ -e hosts ] ; then 
-  # load the hosts file, remove any lines which start with '#' and only take the first string
-  hosts=`cat hosts | egrep -v '^( *)#' | awk '{print $1}' ` ; 
-else
-  # if there's no hosts file we can't do anything anyway, so exit
-  echo "no hosts file?" 
-
+function usage() {
 CAT<<EOF
-create a file in the directory you are currently in, called 'hosts'. 
+create a file in the directory you are currently in, called 'hosts' or declare an environment variable called 'hosts'.
 
 Put hostnames/IPs in the file, you can also use '#' to start comment lines. Then this script will iterate over the hostnames and run commands for you.
 
@@ -32,7 +23,32 @@ examples:
 # check the contents of your home dir on servers:
 ./goto ls -l
 EOF
-  exit 5
+
+}
+
+
+
+# get a host list from either:
+# 1. piped hostnames
+# 2. hosts variable
+# 3. hosts file
+
+
+#piped=`read -t 0 /dev/stdin`
+
+if [ "$piped" ] ; then
+  hosts=$piped
+elif [ "$hosts" ] ; then 
+  # check for a $hosts variable 
+  echo "Using host list from environment variable, ignoring hosts file" >&2
+elif [ -e hosts ] ; then 
+    # load the hosts file, remove any lines which start with '#' and only take the first string
+    hosts=`cat hosts | egrep -v '^( *)#' | awk '{print $1}' ` ; 
+  else
+    # if there's no hosts file we can't do anything anyway, so exit
+    echo "no hosts file?" 
+    usage
+    exit 5
 fi
 
 # specify options files to set ssh options, global and then local
@@ -42,7 +58,7 @@ options=''
 for file in $options_files ; do 
   if [ -e "$file" ] ; then
     # load options, removing lines which start with '#' or are empty
-    options="$options `cat "$file" | sed 's/#.*//g' | egrep -v '^( *)$' `"
+    options="$options `cat "$file" | sed 's/#.*//g' | egrep -v '^( *)$' || echo '' `"
   fi
 done
 
@@ -55,7 +71,7 @@ if [ "$1" == "-l" ] ; then
 elif [ "$1" == "-p" ] ; then
   mode=$1
   shift         # ignore the '-p'
-  command="scp $@" # set command
+  command="scp $options $@" # set command
 else
   REMOTE=true	# set REMOTE
   command=$@	# set command to be the whole string
@@ -89,7 +105,7 @@ elif [ "$mode" == "-l" ] ; then
 elif [ "$mode" == "-p" ] ; then
   for host in $hosts ; do
     echo "# $host:" >&2
-    # run the command locally ignoring ssh options
+    # run the command locally
     $command $host:
     if [ "$?" == "0" ] ; then
       success="$success $host "
